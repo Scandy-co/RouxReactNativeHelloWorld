@@ -1,0 +1,30 @@
+{
+  "name": "roux-react-native-hello-world",
+  "description": "Example app for react-native-roux-sdk",
+  "version": "0.0.1",
+  "private": false,
+  "repository": "https://github.com/Scandy-co/RouxReactNativeHelloWorld",
+  "author": "Scandy <dev@scandy.co> (https://github.com/Scandy-co)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Scandy-co/RouxReactNativeHelloWorld/issues"
+  },
+  "homepage": "https://github.com/Scandy-co/RouxReactNativeHelloWorld#readme",
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start"
+  },
+  "dependencies": {
+    "react": "16.11.0",
+    "react-native": "0.62.0",
+    "react-native-fs": "^2.16.6",
+    "react-native-roux-sdk": "https://github.com/Scandy-co/react-native-roux-sdk"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/runtime": "^7.9.6",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "metro-react-native-babel-preset": "^0.59.0"
+  }
+}
