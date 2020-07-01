@@ -8,7 +8,7 @@ _PLEASE NOTE - DO NOT BUILD FOR A SIMULATOR - SCANDY CORE IS ONLY PACKAGED TO BE
 
 This react-native-roux-sdk is built to be used with `ScandyCore.framework` **v0.7.2**.
 
-We are still working on version linking this react native package and the Roux SDK framework.
+We are still working on version linking this React Native package and the Roux SDK framework.
 
 ## Setup
 
@@ -25,6 +25,8 @@ Select the `RouxSdkExample` target and ensure `ScandyCoreLicense.txt` is in the 
 ### Scandy Core Framework
 
 If you haven't already, download the SDK (button can be found in the top navigation bar of the Roux Portal). Extract the `ScandyCore.zip` file and move `ScandyCore.framework` into `ios/Frameworks/`.
+
+In Xccode, select the `RouxSdkExample` target and ensure `ScandyCore.framework` is in the `General` -> `Frameworks, Libraries and Embedded Content`.
 
 Connect a device and build in Xcode.
 
