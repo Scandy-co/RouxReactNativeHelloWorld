@@ -1,6 +1,6 @@
 # RouxReactNativeHelloWorld
 
-Example app on using Roux SDK with React Native bindings
+Example app using Roux SDK with React Native bindings
 
 _PLEASE NOTE - DO NOT BUILD FOR A SIMULATOR - SCANDY CORE IS ONLY PACKAGED TO BE RUN ON DEVICE_
 
@@ -20,7 +20,7 @@ Rename the license to `ScandyCoreLicense.txt` and move into `ios/ScandyCoreLicen
 
 Open `ios/RouxSdkExample.xcworkspace` in Xcode.
 
-Select the `RouxSdkExample` target and ensure `ScandyCoreLicense.txt` in the `Build Phases` -> `Copy Bundle Resources`.
+Select the `RouxSdkExample` target and ensure `ScandyCoreLicense.txt` is in the `Build Phases` -> `Copy Bundle Resources`.
 
 ### Scandy Core Framework
 
