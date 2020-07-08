@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   StyleSheet,
   View,
@@ -7,13 +7,13 @@ import {
   Button,
   Alert,
   Text,
-} from 'react-native';
-import Roux, { RouxView } from 'react-native-roux-sdk';
-import RNFS from 'react-native-fs';
+} from "react-native";
+import Roux, { RouxView } from "react-native-roux-sdk";
+import RNFS from "react-native-fs";
 
 export default class App extends React.Component {
   state = {
-    v2ScanningMode: true, // v2 scanning on by default
+    v2ScanningMode: null, //v2ScanningMode defaults to true
     scanSize: 1.0, // scan size in mm or meters pending on scanning mode
   };
   constructor(props: Readonly<{}>) {
@@ -22,7 +22,6 @@ export default class App extends React.Component {
 
   setupPreview = async () => {
     try {
-      await Roux.toggleV2Scanning(this.state.v2ScanningMode);
       await Roux.initializeScanner();
       await Roux.startPreview();
     } catch (err) {
@@ -46,10 +45,10 @@ export default class App extends React.Component {
     try {
       const dirPath = `${RNFS.DocumentDirectoryPath}/${Date.now()}`;
       await RNFS.mkdir(dirPath);
-      console.log('made dir', dirPath);
+      console.log("made dir", dirPath);
       const filePath = `${dirPath}/scan.ply`;
       await Roux.saveScan(filePath);
-      Alert.alert('Saved scan', `Saved to: ${filePath}`);
+      Alert.alert("Saved scan", `Saved to: ${filePath}`);
     } catch (err) {
       console.warn(err);
     }
@@ -57,9 +56,9 @@ export default class App extends React.Component {
 
   toggleV2Scanning = async () => {
     try {
-      const v2ScanningMode = !this.state.v2ScanningMode;
-      await Roux.toggleV2Scanning(v2ScanningMode);
-      this.setState({ v2ScanningMode });
+      const v2ScanningMode = await Roux.getV2ScanningEnabled();
+      await Roux.toggleV2Scanning(!v2ScanningMode);
+      this.setState({ v2ScanningMode: !v2ScanningMode });
       this.setSize(this.state.scanSize);
     } catch (err) {
       console.warn(err);
@@ -76,6 +75,12 @@ export default class App extends React.Component {
       console.warn(err);
     }
   };
+
+  async componentDidMount() {
+    //Get default scanning mode and set state
+    const v2ScanningMode = await Roux.getV2ScanningEnabled();
+    this.setState({ v2ScanningMode });
+  }
 
   render() {
     return (
@@ -148,9 +153,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  roux: { flex: 1, backgroundColor: 'blue' },
-  actions: { flex: 1, backgroundColor: 'white', padding: 16 },
+  roux: { flex: 1, backgroundColor: "blue" },
+  actions: { flex: 1, backgroundColor: "white", padding: 16 },
   slider: { flex: 1 },
-  row: { flex: 1, flexDirection: 'row', justifyContent: 'space-between' },
-  column: { flex: 1, flexDirection: 'column', justifyContent: 'space-between' },
+  row: { flex: 1, flexDirection: "row", justifyContent: "space-between" },
+  column: { flex: 1, flexDirection: "column", justifyContent: "space-between" },
 });
