@@ -49,6 +49,7 @@ export default class App extends React.Component {
       const filePath = `${dirPath}/scan.ply`;
       await Roux.saveScan(filePath);
       Alert.alert("Saved scan", `Saved to: ${filePath}`);
+      await Roux.startPreview();
     } catch (err) {
       console.warn(err);
     }
