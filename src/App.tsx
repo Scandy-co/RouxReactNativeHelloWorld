@@ -2,12 +2,13 @@ import React from "react";
 import {
   StyleSheet,
   View,
-  Slider,
   Switch,
-  Button,
+  TouchableOpacity,
   Alert,
   Text,
 } from "react-native";
+import Slider from "@react-native-community/slider";
+
 import Roux, { RouxView } from "react-native-roux-sdk";
 import RNFS from "react-native-fs";
 
@@ -113,24 +114,6 @@ export default class App extends React.Component {
     }
   };
 
-  // uninitializeScanner = async () => {
-  //   // OPTIONAL: RouxView component calls this on componentWillUnmount()
-  //   // Only use uninitializeScanner() if you need to uninitialize the scanner before RouxView unmounts
-  //   await Roux.uninitializeScanner();
-  //   Alert.alert(
-  //     "Uninitialized",
-  //     `Scanner is unitialized. Click OK to reinitialize.`,
-  //     [
-  //       {
-  //         text: "Cancel",
-  //         // onPress: () => console.log("Cancel Pressed"),
-  //         style: "cancel",
-  //       },
-  //       { text: "OK", onPress: () => this.setupPreview() },
-  //     ]
-  //   );
-  // };
-
   async componentDidMount() {
     //Get default scanning mode and set state
     const v2ScanningMode = await Roux.getV2ScanningEnabled();
@@ -138,6 +121,7 @@ export default class App extends React.Component {
   }
 
   render() {
+    const { scanState } = this.state;
     return (
       <View style={styles.container}>
         <RouxView
@@ -150,37 +134,51 @@ export default class App extends React.Component {
           onGenerateMesh={this.onGenerateMesh}
           onSaveMesh={this.onSaveMesh}
         />
-        <View style={styles.actions}>
-          <View style={styles.row}>
-            <View style={styles.column}>
-              <Slider
-                minimumValue={0.2}
-                maximumValue={4}
-                onValueChange={this.setSize}
-              />
-              {this.state.v2ScanningMode ? (
-                <Text>size: {this.state.scanSize}mm</Text>
-              ) : (
-                <Text>size: {this.state.scanSize}m</Text>
-              )}
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.column}>
-              <Switch
-                onValueChange={this.toggleV2Scanning}
-                value={this.state.v2ScanningMode}
-              />
-              <Text>v2 scanning</Text>
-            </View>
-          </View>
-          <View style={styles.row}>
-            <Button title="start scan" onPress={this.startScan} />
-            <Button title="stop scan" onPress={this.stopScan} />
-            <Button title="save scan" onPress={this.saveScan} />
-            {/* <Button title="uninit scanner" onPress={this.uninitializeScanner} /> */}
-          </View>
-        </View>
+        {scanState === "INITIALIZED" ||
+          (scanState === "PREVIEWING" && (
+            <TouchableOpacity
+              title="start scan"
+              onPress={this.startScan}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>START</Text>
+            </TouchableOpacity>
+          ))}
+        {scanState === "SCANNING" && (
+          <TouchableOpacity
+            title="stop scan"
+            onPress={this.stopScan}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>STOP</Text>
+          </TouchableOpacity>
+        )}
+        {scanState === "VIEWING" && (
+          <TouchableOpacity
+            title="save scan"
+            onPress={this.saveScan}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>SAVE</Text>
+          </TouchableOpacity>
+        )}
+        <Slider
+          minimumValue={0.2}
+          maximumValue={4}
+          onValueChange={this.setSize}
+          style={styles.slider}
+        />
+        {this.state.v2ScanningMode ? (
+          <Text>size: {this.state.scanSize}mm</Text>
+        ) : (
+          <Text>size: {this.state.scanSize}m</Text>
+        )}
+
+        <Switch
+          onValueChange={this.toggleV2Scanning}
+          value={this.state.v2ScanningMode}
+        />
+        <Text>v2 scanning</Text>
       </View>
     );
   }
@@ -190,8 +188,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  button: {
+    position: "absolute",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    bottom: 200,
+    width: 150,
+    height: 70,
+    backgroundColor: "#f2494a",
+  },
+  buttonText: {
+    fontSize: 24,
+    color: "white",
+  },
+  // actions: { backgroundColor: "transparent" },
+  // slider: { position: "absolute", backgroundColor: "transparent", bottom: 200 },
   roux: { flex: 1, backgroundColor: "blue" },
-  actions: { flex: 1, backgroundColor: "white", padding: 16 },
-  row: { flex: 1, flexDirection: "row", justifyContent: "space-between" },
-  column: { flex: 1, flexDirection: "column", justifyContent: "flex-start" },
 });
