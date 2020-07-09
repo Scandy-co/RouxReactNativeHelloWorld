@@ -29,26 +29,30 @@ export default class App extends React.Component {
     }
   };
 
-  async onScannerStop() {
+  onPreviewStart = () => {
+    console.log("Preview Started");
+  };
+
+  onScannerStop = async () => {
     try {
       await Roux.generateMesh();
     } catch (err) {
       console.warn(err);
     }
-  }
+  };
 
-  async onGenerateMesh() {
+  onGenerateMesh = () => {
     // call back that generate mesh finished
     console.log("MESH GENERATED");
-  }
+  };
 
-  async onSaveMesh() {
+  onSaveMesh = async () => {
     // call back that generate mesh finished
     console.log("MESH SAVED");
     await Roux.startPreview();
-  }
+  };
 
-  async saveScan() {
+  saveScan = async () => {
     try {
       const dirPath = `${RNFS.DocumentDirectoryPath}/${Date.now()}`;
       await RNFS.mkdir(dirPath);
@@ -59,7 +63,7 @@ export default class App extends React.Component {
     } catch (err) {
       console.warn(err);
     }
-  }
+  };
 
   toggleV2Scanning = async () => {
     try {
@@ -95,7 +99,7 @@ export default class App extends React.Component {
         <RouxView
           style={styles.roux}
           onVisualizerReady={this.setupPreview}
-          // onPreviewStart={this.onPreviewStart}
+          onPreviewStart={this.onPreviewStart}
           // onScannerStart={this.onScannerStart}
           onScannerStop={this.onScannerStop}
           onGenerateMesh={this.onGenerateMesh}
