@@ -33,6 +33,10 @@ export default class App extends React.Component {
     console.log("Preview Started");
   };
 
+  onScannerStart = () => {
+    console.log("Scanner Started");
+  };
+
   onScannerStop = async () => {
     try {
       await Roux.generateMesh();
@@ -100,7 +104,7 @@ export default class App extends React.Component {
           style={styles.roux}
           onVisualizerReady={this.setupPreview}
           onPreviewStart={this.onPreviewStart}
-          // onScannerStart={this.onScannerStart}
+          onScannerStart={this.onScannerStart}
           onScannerStop={this.onScannerStop}
           onGenerateMesh={this.onGenerateMesh}
           onSaveMesh={this.onSaveMesh}
