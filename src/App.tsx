@@ -150,10 +150,17 @@ export default class App extends React.Component {
                 onValueChange={this.setSize}
                 style={styles.slider}
               />
-              <Text style={styles.sliderText}>
+              <Text style={styles.previewLabel}>
                 size: {this.state.scanSize}
                 {this.state.v2ScanningMode ? "mm" : "m"}
               </Text>
+            </View>
+            <View style={styles.v2SwitchContainer}>
+              <Switch
+                onValueChange={this.toggleV2Scanning}
+                value={this.state.v2ScanningMode}
+              />
+              <Text style={styles.previewLabel}>v2 scanning</Text>
             </View>
           </>
         )}
@@ -175,12 +182,6 @@ export default class App extends React.Component {
             <Text style={styles.buttonText}>SAVE</Text>
           </TouchableOpacity>
         )}
-
-        <Switch
-          onValueChange={this.toggleV2Scanning}
-          value={this.state.v2ScanningMode}
-        />
-        <Text>v2 scanning</Text>
       </View>
     );
   }
@@ -207,15 +208,20 @@ const styles = StyleSheet.create({
   // actions: { backgroundColor: "transparent" },
   sliderContainer: {
     position: "absolute",
-    backgroundColor: "transparent",
     bottom: 70,
     width: "80%",
     alignSelf: "center",
   },
-  sliderText: {
+  previewLabel: {
     color: "white",
     alignSelf: "center",
     fontSize: 20,
+  },
+  v2SwitchContainer: {
+    position: "absolute",
+    alignItems: "center",
+    top: 100,
+    right: 10,
   },
   roux: { flex: 1, backgroundColor: "blue" },
 });
