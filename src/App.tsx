@@ -39,6 +39,13 @@ export default class App extends React.Component {
 
   async onGenerateMesh() {
     // call back that generate mesh finished
+    console.log("MESH GENERATED");
+  }
+
+  async onSaveMesh() {
+    // call back that generate mesh finished
+    console.log("MESH SAVED");
+    await Roux.startPreview();
   }
 
   async saveScan() {
@@ -49,7 +56,6 @@ export default class App extends React.Component {
       const filePath = `${dirPath}/scan.ply`;
       await Roux.saveScan(filePath);
       Alert.alert("Saved scan", `Saved to: ${filePath}`);
-      await Roux.startPreview();
     } catch (err) {
       console.warn(err);
     }
@@ -89,8 +95,11 @@ export default class App extends React.Component {
         <RouxView
           style={styles.roux}
           onVisualizerReady={this.setupPreview}
+          // onPreviewStart={this.onPreviewStart}
+          // onScannerStart={this.onScannerStart}
           onScannerStop={this.onScannerStop}
           onGenerateMesh={this.onGenerateMesh}
+          onSaveMesh={this.onSaveMesh}
         />
         <View style={styles.actions}>
           <View style={styles.row}>
