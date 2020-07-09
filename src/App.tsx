@@ -126,12 +126,6 @@ export default class App extends React.Component {
               />
               <Text>v2 scanning</Text>
             </View>
-            <View style={styles.column}>
-              <Switch />
-            </View>
-            <View style={styles.column}>
-              <Switch />
-            </View>
           </View>
           <View style={styles.row}>
             <Button
