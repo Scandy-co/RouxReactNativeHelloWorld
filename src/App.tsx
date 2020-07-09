@@ -112,18 +112,16 @@ export default class App extends React.Component {
         <View style={styles.actions}>
           <View style={styles.row}>
             <View style={styles.column}>
+              <Slider
+                minimumValue={0.2}
+                maximumValue={4}
+                onValueChange={this.setSize}
+              />
               {this.state.v2ScanningMode ? (
                 <Text>size: {this.state.scanSize}mm</Text>
               ) : (
                 <Text>size: {this.state.scanSize}m</Text>
               )}
-
-              <Slider
-                minimumValue={0.2}
-                maximumValue={4}
-                style={styles.slider}
-                onValueChange={this.setSize}
-              />
             </View>
           </View>
           <View style={styles.row}>
@@ -167,7 +165,6 @@ const styles = StyleSheet.create({
   },
   roux: { flex: 1, backgroundColor: "blue" },
   actions: { flex: 1, backgroundColor: "white", padding: 16 },
-  slider: { flex: 1 },
   row: { flex: 1, flexDirection: "row", justifyContent: "space-between" },
-  column: { flex: 1, flexDirection: "column", justifyContent: "space-between" },
+  column: { flex: 1, flexDirection: "column", justifyContent: "flex-start" },
 });
