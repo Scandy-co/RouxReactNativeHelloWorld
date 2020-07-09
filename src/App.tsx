@@ -76,6 +76,12 @@ export default class App extends React.Component {
   onSaveMesh = async () => {
     // call back that generate mesh finished
     console.log("MESH SAVED");
+    this.restartScanner();
+  };
+
+  restartScanner = async () => {
+    //NOTE: you do not need to call initializeScanner again; 
+    // scanner will remain initialized until RouxView unmounts
     await Roux.startPreview();
   };
 
@@ -136,11 +142,7 @@ export default class App extends React.Component {
         />
         {(scanState === "INITIALIZED" || scanState === "PREVIEWING") && (
           <>
-            <TouchableOpacity
-              title="start scan"
-              onPress={this.startScan}
-              style={styles.button}
-            >
+            <TouchableOpacity onPress={this.startScan} style={styles.button}>
               <Text style={styles.buttonText}>START</Text>
             </TouchableOpacity>
             <View style={styles.sliderContainer}>
@@ -165,22 +167,22 @@ export default class App extends React.Component {
           </>
         )}
         {scanState === "SCANNING" && (
-          <TouchableOpacity
-            title="stop scan"
-            onPress={this.stopScan}
-            style={styles.button}
-          >
+          <TouchableOpacity onPress={this.stopScan} style={styles.button}>
             <Text style={styles.buttonText}>STOP</Text>
           </TouchableOpacity>
         )}
         {scanState === "VIEWING" && (
-          <TouchableOpacity
-            title="save scan"
-            onPress={this.saveScan}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>SAVE</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity onPress={this.saveScan} style={styles.button}>
+              <Text style={styles.buttonText}>SAVE</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={this.restartScanner}
+              style={styles.newScanButton}
+            >
+              <Text style={styles.buttonText}>NEW SCAN</Text>
+            </TouchableOpacity>
+          </>
         )}
       </View>
     );
@@ -200,6 +202,16 @@ const styles = StyleSheet.create({
     width: 150,
     height: 70,
     backgroundColor: "#f2494a",
+  },
+  newScanButton: {
+    position: "absolute",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    bottom: 70,
+    width: 150,
+    height: 70,
+    backgroundColor: "#586168",
   },
   buttonText: {
     fontSize: 24,
