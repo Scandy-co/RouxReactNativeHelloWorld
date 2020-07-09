@@ -13,6 +13,7 @@ import RNFS from "react-native-fs";
 
 export default class App extends React.Component {
   state = {
+    scanState: "",
     v2ScanningMode: null, //v2ScanningMode defaults to true
     scanSize: 1.0, // scan size in mm or meters pending on scanning mode
   };
@@ -20,10 +21,31 @@ export default class App extends React.Component {
     super(props);
   }
 
+  handleScanStateChanged = (scanState) => {
+    console.log("Scan State: ", scanState);
+    this.setState({ scanState });
+  };
+
   setupPreview = async () => {
     try {
       await Roux.initializeScanner();
       await Roux.startPreview();
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  startScan = async () => {
+    try {
+      await Roux.startScan();
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  stopScan = async () => {
+    try {
+      await Roux.stopScan();
     } catch (err) {
       console.warn(err);
     }
@@ -91,6 +113,24 @@ export default class App extends React.Component {
     }
   };
 
+  // uninitializeScanner = async () => {
+  //   // OPTIONAL: RouxView component calls this on componentWillUnmount()
+  //   // Only use uninitializeScanner() if you need to uninitialize the scanner before RouxView unmounts
+  //   await Roux.uninitializeScanner();
+  //   Alert.alert(
+  //     "Uninitialized",
+  //     `Scanner is unitialized. Click OK to reinitialize.`,
+  //     [
+  //       {
+  //         text: "Cancel",
+  //         // onPress: () => console.log("Cancel Pressed"),
+  //         style: "cancel",
+  //       },
+  //       { text: "OK", onPress: () => this.setupPreview() },
+  //     ]
+  //   );
+  // };
+
   async componentDidMount() {
     //Get default scanning mode and set state
     const v2ScanningMode = await Roux.getV2ScanningEnabled();
@@ -102,6 +142,7 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <RouxView
           style={styles.roux}
+          onScanStateChanged={this.handleScanStateChanged}
           onVisualizerReady={this.setupPreview}
           onPreviewStart={this.onPreviewStart}
           onScannerStart={this.onScannerStart}
@@ -134,24 +175,10 @@ export default class App extends React.Component {
             </View>
           </View>
           <View style={styles.row}>
-            <Button
-              title="start scan"
-              onPress={() => {
-                Roux.startScan();
-              }}
-            />
-            <Button
-              title="stop scan"
-              onPress={() => {
-                Roux.stopScan();
-              }}
-            />
-            <Button
-              title="save scan"
-              onPress={() => {
-                this.saveScan();
-              }}
-            />
+            <Button title="start scan" onPress={this.startScan} />
+            <Button title="stop scan" onPress={this.stopScan} />
+            <Button title="save scan" onPress={this.saveScan} />
+            {/* <Button title="uninit scanner" onPress={this.uninitializeScanner} /> */}
           </View>
         </View>
       </View>
