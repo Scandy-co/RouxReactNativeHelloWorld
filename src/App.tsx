@@ -134,8 +134,8 @@ export default class App extends React.Component {
           onGenerateMesh={this.onGenerateMesh}
           onSaveMesh={this.onSaveMesh}
         />
-        {scanState === "INITIALIZED" ||
-          (scanState === "PREVIEWING" && (
+        {(scanState === "INITIALIZED" || scanState === "PREVIEWING") && (
+          <>
             <TouchableOpacity
               title="start scan"
               onPress={this.startScan}
@@ -143,7 +143,20 @@ export default class App extends React.Component {
             >
               <Text style={styles.buttonText}>START</Text>
             </TouchableOpacity>
-          ))}
+            <View style={styles.sliderContainer}>
+              <Slider
+                minimumValue={0.2}
+                maximumValue={4}
+                onValueChange={this.setSize}
+                style={styles.slider}
+              />
+              <Text style={styles.sliderText}>
+                size: {this.state.scanSize}
+                {this.state.v2ScanningMode ? "mm" : "m"}
+              </Text>
+            </View>
+          </>
+        )}
         {scanState === "SCANNING" && (
           <TouchableOpacity
             title="stop scan"
@@ -161,17 +174,6 @@ export default class App extends React.Component {
           >
             <Text style={styles.buttonText}>SAVE</Text>
           </TouchableOpacity>
-        )}
-        <Slider
-          minimumValue={0.2}
-          maximumValue={4}
-          onValueChange={this.setSize}
-          style={styles.slider}
-        />
-        {this.state.v2ScanningMode ? (
-          <Text>size: {this.state.scanSize}mm</Text>
-        ) : (
-          <Text>size: {this.state.scanSize}m</Text>
         )}
 
         <Switch
@@ -193,7 +195,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    bottom: 200,
+    bottom: 150,
     width: 150,
     height: 70,
     backgroundColor: "#f2494a",
@@ -203,6 +205,17 @@ const styles = StyleSheet.create({
     color: "white",
   },
   // actions: { backgroundColor: "transparent" },
-  // slider: { position: "absolute", backgroundColor: "transparent", bottom: 200 },
+  sliderContainer: {
+    position: "absolute",
+    backgroundColor: "transparent",
+    bottom: 70,
+    width: "80%",
+    alignSelf: "center",
+  },
+  sliderText: {
+    color: "white",
+    alignSelf: "center",
+    fontSize: 20,
+  },
   roux: { flex: 1, backgroundColor: "blue" },
 });
