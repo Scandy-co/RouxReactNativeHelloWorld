@@ -235,6 +235,8 @@ PODS:
   - React-jsinspector (0.62.0)
   - react-native-roux-sdk (0.1.0):
     - React
+  - react-native-segmented-control (2.1.0):
+    - React
   - react-native-slider (3.0.0):
     - React
   - React-RCTActionSheet (0.62.0):
@@ -325,6 +327,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-roux-sdk (from `../node_modules/react-native-roux-sdk`)
+  - "react-native-segmented-control (from `../node_modules/@react-native-community/segmented-control`)"
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -386,6 +389,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-roux-sdk:
     :path: "../node_modules/react-native-roux-sdk"
+  react-native-segmented-control:
+    :path: "../node_modules/@react-native-community/segmented-control"
   react-native-slider:
     :path: "../node_modules/@react-native-community/slider"
   React-RCTActionSheet:
@@ -440,6 +445,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 8bf0b2707f05865113415088c398a7f98c0cf546
   React-jsinspector: 8e5913c4c6c54f0d3f9c9fc630c465a89cded65d
   react-native-roux-sdk: 446925372353148b4f7a746058f3ea24df9624e6
+  react-native-segmented-control: 4ce904755f67bf17d5250d265d57e40db045ac34
   react-native-slider: 12bd76d3d568c9c5500825db54123d44b48e4ad4
   React-RCTActionSheet: 674afbc8b9c76e0a83520e0a51da29a70802c03f
   React-RCTAnimation: f5f24330d09ee677fb49e0782f8321868f4df431
