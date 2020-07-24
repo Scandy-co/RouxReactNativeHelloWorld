@@ -30,42 +30,71 @@ export default class App extends React.Component {
     this.setState({ scanState })
   }
 
-  setupPreview = async (deviceType) => {
-    var scannerType
-    switch (deviceType) {
-      case 'MIRROR':
-        await Roux.setSendRenderedStream(false)
-        await Roux.setReceiveNetworkCommands(false)
-        await Roux.setReceiveRenderedStream(true)
-        await Roux.setSendNetworkCommands(true)
-        scannerType = 'network'
+  initializeMirrorDevice = async () => {
+    await Roux.setSendRenderedStream(false)
+    await Roux.setReceiveNetworkCommands(false)
+    await Roux.setReceiveRenderedStream(true)
+    await Roux.setSendNetworkCommands(true)
 
-        var IPAddress = await Roux.getIPAddress()
-        this.setState({ IPAddress })
-
-        break
-      case 'SCANNER':
-        Roux.setSendRenderedStream(true)
-        Roux.setReceiveNetworkCommands(true)
-        Roux.setReceiveRenderedStream(false)
-        Roux.setSendNetworkCommands(false)
-        scannerType = 'true_depth'
-        break
-      default:
-        break
-    }
+    scannerType = 'network'
 
     try {
-      await Roux.initializeScanner(scannerType)
-      // await Roux.startPreview()
+      //TODO: test error catching with no wifi
+      var IPAddress = await Roux.getIPAddress()
+      console.log(`getIPAddress: ${IPAddress}`)
+      this.setState({ IPAddress })
+      await Roux.setServerHost(IPAddress)
+    } catch (e) {
+      console.log(e)
+      this.setState({ IPAddress: 'NOT FOUND' })
+    }
+    try {
+      await Roux.initializeScanner('network')
+      await Roux.startPreview()
     } catch (err) {
       console.warn(err)
     }
   }
 
+  initializeScanningDevice = async () => {
+    await Roux.setSendRenderedStream(true)
+    await Roux.setReceiveNetworkCommands(true)
+    await Roux.setReceiveRenderedStream(false)
+    await Roux.setSendNetworkCommands(false)
+    try {
+      await Roux.initializeScanner('true_depth')
+      await Roux.startPreview()
+    } catch (err) {
+      console.warn(err)
+    }
+  }
+
+  setupPreview = async () => {
+    const { selectedDeviceType } = this.state
+
+    switch (selectedDeviceType) {
+      case 0: // Mirror device
+        await this.initializeMirrorDevice()
+        break
+      case 1: // Scanner device
+        await this.initializeScanningDevice()
+        break
+      default:
+        break
+    }
+  }
+
+  handleDeviceTypeToggled = async (e) => {
+    let deviceType = e.nativeEvent.selectedSegmentIndex
+    this.setState({ selectedDeviceType: deviceType })
+    await Roux.uninitializeScanner()
+    this.setupPreview()
+  }
+
   startScan = async () => {
     try {
-      await Roux.startScan()
+      status = await Roux.startScan()
+      console.log(`startScan: ${status}`)
     } catch (err) {
       console.warn(err)
     }
@@ -73,7 +102,8 @@ export default class App extends React.Component {
 
   stopScan = async () => {
     try {
-      await Roux.stopScan()
+      status = await Roux.stopScan()
+      console.log(`stopScan: ${status}`)
     } catch (err) {
       console.warn(err)
     }
@@ -89,7 +119,8 @@ export default class App extends React.Component {
 
   onScannerStop = async () => {
     try {
-      await Roux.generateMesh()
+      status = await Roux.generateMesh()
+      console.log(`generateMesh: ${status}`)
     } catch (err) {
       console.warn(err)
     }
@@ -109,7 +140,8 @@ export default class App extends React.Component {
   restartScanner = async () => {
     //NOTE: you do not need to call initializeScanner again;
     // scanner will remain initialized until RouxView unmounts
-    await Roux.startPreview()
+    status = await Roux.startPreview()
+    console.log(`startPreview: ${status}`)
   }
 
   saveScan = async () => {
@@ -118,7 +150,8 @@ export default class App extends React.Component {
       await RNFS.mkdir(dirPath)
       console.log('made dir', dirPath)
       const filePath = `${dirPath}/scan.ply`
-      await Roux.saveScan(filePath)
+      status = await Roux.saveScan(filePath)
+      console.log(`saveScan: ${status}`)
       Alert.alert('Saved scan', `Saved to: ${filePath}`)
     } catch (err) {
       console.warn(err)
@@ -139,7 +172,8 @@ export default class App extends React.Component {
   setSize = async (val: number) => {
     try {
       const size = this.state.v2ScanningMode ? val * 1e-3 : val
-      await Roux.setSize(size)
+      status = await Roux.setSize(size)
+      console.log(`setSize: ${status}`)
       // Round the number to the tenth precision
       this.setState({ scanSize: Math.floor(val * 10) / 10 })
     } catch (err) {
@@ -147,16 +181,14 @@ export default class App extends React.Component {
     }
   }
 
+  handleScannerReady = () => {
+    // console.log('Hi im ready')
+  }
+
   async componentDidMount() {
     //Get default scanning mode and set state
     const v2ScanningMode = await Roux.getV2ScanningEnabled()
     this.setState({ v2ScanningMode })
-  }
-
-  handleDeviceTypeToggled = (e) => {
-    let deviceType = e.nativeEvent.selectedSegmentIndex
-    this.setState({ selectedDeviceType: deviceType })
-    // Roux.uninitializeScanner();
   }
 
   render() {
@@ -168,7 +200,8 @@ export default class App extends React.Component {
         <RouxView
           style={styles.roux}
           onScanStateChanged={this.handleScanStateChanged}
-          onVisualizerReady={() => this.setupPreview(deviceType)}
+          onScannerReady={this.handleScannerReady}
+          onVisualizerReady={this.setupPreview}
           onPreviewStart={this.onPreviewStart}
           onScannerStart={this.onScannerStart}
           onScannerStop={this.onScannerStop}
