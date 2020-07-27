@@ -21,6 +21,7 @@ export default class App extends React.Component {
       selectedDeviceType: 0,
       deviceIPAddress: '',
       connectedIPAddress: '',
+      connectedToHost: false,
       displayIPPicker: true,
       discoveredHosts: [],
       scanState: '',
@@ -197,11 +198,18 @@ export default class App extends React.Component {
   }
 
   handleIPAddressPickerChange = (IPAddress) => {
-    this.setState({connectedIPAddress: IPAddress})
+    this.setState({ connectedIPAddress: IPAddress })
   }
 
-  connectToHost = () => {
-    // Roux.connect
+  connectToHost = async () => {
+    try {
+      await Roux.clearCommandHosts()
+      await Roux.connectToCommandHost(this.state.connectedIPAddress)
+      await Roux.setServerHost(this.state.connectedIPAddress)
+      this.setState({ connectedToHost: true, displayIPPicker: false })
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   async componentDidMount() {
@@ -295,7 +303,8 @@ export default class App extends React.Component {
         {deviceType === 'SCANNER' && (
           <>
             <Text style={styles.ipAddressLabel}>
-              Connected to: {this.state.connectedIPAddress}
+              Connected to:{' '}
+              {this.state.connectedToHost ? this.state.connectedIPAddress : ''}
             </Text>
             {(scanState === 'INITIALIZED' || scanState === 'PREVIEWING') && (
               <>
@@ -305,7 +314,9 @@ export default class App extends React.Component {
                       <Picker
                         style={styles.IPAddressPicker}
                         selectedValue={this.state.connectedIPAddress || 0}
-                        onValueChange={(IPAddress) => this.handleIPAddressPickerChange(IPAddress)}
+                        onValueChange={(IPAddress) =>
+                          this.handleIPAddressPickerChange(IPAddress)
+                        }
                       >
                         <Picker.Item label={'Pick a Mirror Device'} value={0} />
                         {discoveredHosts &&
