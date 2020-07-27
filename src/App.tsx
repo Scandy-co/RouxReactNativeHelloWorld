@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   Text,
+  Picker,
 } from 'react-native'
 import Slider from '@react-native-community/slider'
 import SegmentedControl from '@react-native-community/segmented-control'
@@ -18,7 +19,10 @@ export default class App extends React.Component {
     super(props)
     this.state = {
       selectedDeviceType: 0,
-      IPAddress: '',
+      deviceIPAddress: '',
+      connectedIPAddress: '',
+      displayIPPicker: true,
+      discoveredHosts: [],
       scanState: '',
       v2ScanningMode: null, //v2ScanningMode defaults to true
       scanSize: 1.0, // scan size in mm or meters pending on scanning mode
@@ -40,13 +44,12 @@ export default class App extends React.Component {
 
     try {
       //TODO: test error catching with no wifi
-      var IPAddress = await Roux.getIPAddress()
-      console.log(`getIPAddress: ${IPAddress}`)
-      this.setState({ IPAddress })
-      await Roux.setServerHost(IPAddress)
+      var deviceIPAddress = await Roux.getIPAddress()
+      this.setState({ deviceIPAddress })
+      await Roux.setServerHost(deviceIPAddress)
     } catch (e) {
       console.log(e)
-      this.setState({ IPAddress: 'NOT FOUND' })
+      this.setState({ deviceIPAddress: 'NOT CONNECTED TO WIFI' })
     }
     try {
       await Roux.initializeScanner('network')
@@ -64,6 +67,8 @@ export default class App extends React.Component {
     try {
       await Roux.initializeScanner('true_depth')
       await Roux.startPreview()
+      var hosts = await Roux.getDiscoveredHosts()
+      this.setState({ discoveredHosts: hosts, displayIPPicker: true })
     } catch (err) {
       console.warn(err)
     }
@@ -82,6 +87,12 @@ export default class App extends React.Component {
       default:
         break
     }
+  }
+
+  handleHostDiscovered = async () => {
+    console.log('Host discovered')
+    var hosts = await Roux.getDiscoveredHosts()
+    this.setState({ discoveredHosts: hosts })
   }
 
   handleDeviceTypeToggled = async (e) => {
@@ -185,6 +196,14 @@ export default class App extends React.Component {
     // console.log('Hi im ready')
   }
 
+  handleIPAddressPickerChange = (IPAddress) => {
+    this.setState({connectedIPAddress: IPAddress})
+  }
+
+  connectToHost = () => {
+    // Roux.connect
+  }
+
   async componentDidMount() {
     //Get default scanning mode and set state
     const v2ScanningMode = await Roux.getV2ScanningEnabled()
@@ -192,7 +211,7 @@ export default class App extends React.Component {
   }
 
   render() {
-    const { scanState } = this.state
+    const { scanState, discoveredHosts } = this.state
     const deviceType =
       this.state.selectedDeviceType === 0 ? 'MIRROR' : 'SCANNER'
     return (
@@ -202,6 +221,7 @@ export default class App extends React.Component {
           onScanStateChanged={this.handleScanStateChanged}
           onScannerReady={this.handleScannerReady}
           onVisualizerReady={this.setupPreview}
+          onHostDiscovered={this.handleHostDiscovered}
           onPreviewStart={this.onPreviewStart}
           onScannerStart={this.onScannerStart}
           onScannerStop={this.onScannerStop}
@@ -220,7 +240,7 @@ export default class App extends React.Component {
         {deviceType === 'MIRROR' && (
           <>
             <Text style={styles.ipAddressLabel}>
-              IP Address: {this.state.IPAddress}
+              IP Address: {this.state.deviceIPAddress}
             </Text>
             {(scanState === 'INITIALIZED' || scanState === 'PREVIEWING') && (
               <>
@@ -274,9 +294,37 @@ export default class App extends React.Component {
         {/* SCANNER DEVICE SET UP */}
         {deviceType === 'SCANNER' && (
           <>
+            <Text style={styles.ipAddressLabel}>
+              Connected to: {this.state.connectedIPAddress}
+            </Text>
             {(scanState === 'INITIALIZED' || scanState === 'PREVIEWING') && (
-              <></>
+              <>
+                {this.state.displayIPPicker && (
+                  <>
+                    <View style={styles.IPAddressPickerContainer}>
+                      <Picker
+                        style={styles.IPAddressPicker}
+                        selectedValue={this.state.connectedIPAddress || 0}
+                        onValueChange={(IPAddress) => this.handleIPAddressPickerChange(IPAddress)}
+                      >
+                        <Picker.Item label={'Pick a Mirror Device'} value={0} />
+                        {discoveredHosts &&
+                          discoveredHosts.map((host) => {
+                            return <Picker.Item label={host} value={host} />
+                          })}
+                      </Picker>
+                    </View>
+                    <TouchableOpacity
+                      style={{ ...styles.button, backgroundColor: '#3053FF' }}
+                      onPress={this.connectToHost}
+                    >
+                      <Text style={styles.buttonText}>CONNECT</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </>
             )}
+
             {scanState === 'SCANNING' && <></>}
             {scanState === 'VIEWING' && <></>}
           </>
@@ -347,5 +395,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     top: 150,
     right: 10,
+  },
+  IPAddressPickerContainer: {
+    position: 'absolute',
+    bottom: 270,
+    width: '80%',
+    alignSelf: 'center',
+    backgroundColor: '#fff',
   },
 })
