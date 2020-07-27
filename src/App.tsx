@@ -67,7 +67,6 @@ export default class App extends React.Component {
     await Roux.setSendNetworkCommands(false)
     try {
       await Roux.initializeScanner('true_depth')
-      await Roux.startPreview()
       var hosts = await Roux.getDiscoveredHosts()
       this.setState({ discoveredHosts: hosts, displayIPPicker: true })
     } catch (err) {
@@ -162,7 +161,6 @@ export default class App extends React.Component {
       await RNFS.mkdir(dirPath)
       const filePath = `${dirPath}/scan.ply`
       status = await Roux.saveScan(filePath)
-      console.log(`saveScan: ${status}`)
       Alert.alert('Saved scan', `Saved to: ${filePath}`)
     } catch (err) {
       console.warn(err)
@@ -205,6 +203,7 @@ export default class App extends React.Component {
       await Roux.clearCommandHosts()
       await Roux.connectToCommandHost(this.state.connectedIPAddress)
       await Roux.setServerHost(this.state.connectedIPAddress)
+      await Roux.startPreview()
       this.setState({ connectedToHost: true, displayIPPicker: false })
     } catch (e) {
       console.log(e)
@@ -312,12 +311,15 @@ export default class App extends React.Component {
                     <View style={styles.IPAddressPickerContainer}>
                       <Picker
                         style={styles.IPAddressPicker}
-                        selectedValue={this.state.connectedIPAddress || 0}
+                        selectedValue={this.state.connectedIPAddress || ''}
                         onValueChange={(IPAddress) =>
                           this.handleIPAddressPickerChange(IPAddress)
                         }
                       >
-                        <Picker.Item label={'Pick a Mirror Device'} value={0} />
+                        <Picker.Item
+                          label={'Pick a Mirror Device'}
+                          value={''}
+                        />
                         {discoveredHosts &&
                           discoveredHosts.map((host) => {
                             return <Picker.Item label={host} value={host} />
@@ -325,7 +327,12 @@ export default class App extends React.Component {
                       </Picker>
                     </View>
                     <TouchableOpacity
-                      style={{ ...styles.button, backgroundColor: '#3053FF' }}
+                      style={
+                        this.state.connectedIPAddress
+                          ? { ...styles.button, backgroundColor: '#3053FF' }
+                          : { ...styles.button, backgroundColor: '#D3D3D3', opacity: .5 }
+                      }
+                      disabled={!this.state.connectedIPAddress}
                       onPress={this.connectToHost}
                     >
                       <Text style={styles.buttonText}>CONNECT</Text>
@@ -334,7 +341,11 @@ export default class App extends React.Component {
                 ) : (
                   <>
                     <TouchableOpacity
-                      style={{ ...styles.button, backgroundColor: '#586168', width: 300 }}
+                      style={{
+                        ...styles.button,
+                        backgroundColor: '#586168',
+                        width: 300,
+                      }}
                       onPress={() => {
                         this.setState({ displayIPPicker: true })
                       }}
