@@ -237,7 +237,7 @@ PODS:
     - React
   - react-native-segmented-control (2.1.0):
     - React
-  - react-native-slider (3.0.0):
+  - react-native-slider (3.0.3):
     - React
   - React-RCTActionSheet (0.62.0):
     - React-Core/RCTActionSheetHeaders (= 0.62.0)
@@ -446,7 +446,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 8e5913c4c6c54f0d3f9c9fc630c465a89cded65d
   react-native-roux-sdk: 446925372353148b4f7a746058f3ea24df9624e6
   react-native-segmented-control: 4ce904755f67bf17d5250d265d57e40db045ac34
-  react-native-slider: 12bd76d3d568c9c5500825db54123d44b48e4ad4
+  react-native-slider: e99fc201cefe81270fc9d81714a7a0f5e566b168
   React-RCTActionSheet: 674afbc8b9c76e0a83520e0a51da29a70802c03f
   React-RCTAnimation: f5f24330d09ee677fb49e0782f8321868f4df431
   React-RCTBlob: b773ce6138ab0d172ebd8a455fd4efd200a92549
