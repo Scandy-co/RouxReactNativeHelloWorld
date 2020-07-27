@@ -307,7 +307,7 @@ export default class App extends React.Component {
             </Text>
             {(scanState === 'INITIALIZED' || scanState === 'PREVIEWING') && (
               <>
-                {this.state.displayIPPicker && (
+                {this.state.displayIPPicker ? (
                   <>
                     <View style={styles.IPAddressPickerContainer}>
                       <Picker
@@ -331,6 +331,19 @@ export default class App extends React.Component {
                       <Text style={styles.buttonText}>CONNECT</Text>
                     </TouchableOpacity>
                   </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={{ ...styles.button, backgroundColor: '#586168', width: 300 }}
+                      onPress={() => {
+                        this.setState({ displayIPPicker: true })
+                      }}
+                    >
+                      <Text style={styles.buttonText}>
+                        Change Mirror Device
+                      </Text>
+                    </TouchableOpacity>
+                  </>
                 )}
               </>
             )}
@@ -341,10 +354,7 @@ export default class App extends React.Component {
             )}
             {scanState === 'VIEWING' && (
               <>
-                <TouchableOpacity
-                  onPress={this.saveScan}
-                  style={styles.button}
-                >
+                <TouchableOpacity onPress={this.saveScan} style={styles.button}>
                   <Text style={styles.buttonText}>Save Mesh</Text>
                 </TouchableOpacity>
               </>
