@@ -54,7 +54,7 @@ await Roux.setSendRenderedStream(true)
 await Roux.setReceiveNetworkCommands(true)
 ```
 
-1. Initialize
+3. Initialize
 The scanning device can be initialized as you normally would.
 
 
