@@ -89,7 +89,6 @@ export default class App extends React.Component {
   }
 
   handleHostDiscovered = async () => {
-    console.log('Host discovered')
     var hosts = await Roux.getDiscoveredHosts()
     this.setState({ discoveredHosts: hosts })
   }
@@ -103,8 +102,7 @@ export default class App extends React.Component {
 
   startScan = async () => {
     try {
-      status = await Roux.startScan()
-      console.log(`startScan: ${status}`)
+      await Roux.startScan()
     } catch (err) {
       console.warn(err)
     }
@@ -112,19 +110,10 @@ export default class App extends React.Component {
 
   stopScan = async () => {
     try {
-      status = await Roux.stopScan()
-      console.log(`stopScan: ${status}`)
+      await Roux.stopScan()
     } catch (err) {
       console.warn(err)
     }
-  }
-
-  onPreviewStart = () => {
-    console.log('Preview Started')
-  }
-
-  onScannerStart = () => {
-    console.log('Scanner Started')
   }
 
   onScannerStop = async () => {
@@ -137,18 +126,11 @@ export default class App extends React.Component {
 
   onGenerateMesh = () => {
     // call back that generate mesh finished
-    console.log('MESH GENERATED')
     Alert.alert(
       'Scanning Complete',
       `Mesh has been generated on scanning device.`,
       [{ text: 'Take new scan', onPress: this.setupPreview }]
     )
-  }
-
-  onSaveMesh = async () => {
-    // call back that generate mesh finished
-    console.log('MESH SAVED')
-    this.setupPreview()
   }
 
   saveScan = async () => {
@@ -217,11 +199,9 @@ export default class App extends React.Component {
           onScanStateChanged={this.handleScanStateChanged}
           onVisualizerReady={this.setupPreview}
           onHostDiscovered={this.handleHostDiscovered}
-          onPreviewStart={this.onPreviewStart}
-          onScannerStart={this.onScannerStart}
           onScannerStop={this.onScannerStop}
           onGenerateMesh={this.onGenerateMesh}
-          onSaveMesh={this.onSaveMesh}
+          onSaveMesh={this.setupPreview}
         />
         <SegmentedControl
           style={styles.deviceToggle}
