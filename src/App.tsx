@@ -44,12 +44,11 @@ export default class App extends React.Component {
     scannerType = 'network'
 
     try {
-      //TODO: test error catching with no wifi
       var deviceIPAddress = await Roux.getIPAddress()
       this.setState({ deviceIPAddress })
       await Roux.setServerHost(deviceIPAddress)
     } catch (e) {
-      console.log(e)
+      console.warn(e)
       this.setState({ deviceIPAddress: 'NOT CONNECTED TO WIFI' })
     }
     try {
@@ -197,7 +196,7 @@ export default class App extends React.Component {
       await Roux.startPreview()
       this.setState({ connectedToHost: true, displayIPPicker: false })
     } catch (e) {
-      console.log(e)
+      console.warn(e)
     }
   }
 
