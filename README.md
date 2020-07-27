@@ -54,7 +54,7 @@ await Roux.setSendRenderedStream(true)
 await Roux.setReceiveNetworkCommands(true)
 ```
 
-1. Initialize
+3. Initialize
 The scanning device can be initialized as you normally would.
 
 
@@ -89,5 +89,5 @@ await Roux.connectToCommandHost(mirror_ip);
 We can then use that same IP address to tell the scanning device to send the rendered scan preview to the mirror device.
 
 ```
-await Roux.setServerHost(mirror_ip;
+await Roux.setServerHost(mirror_ip);
 ```
