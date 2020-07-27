@@ -26,7 +26,7 @@ export default class App extends React.Component {
       discoveredHosts: [],
       scanState: '',
       v2ScanningMode: null, //v2ScanningMode defaults to true
-      scanSize: 0.2, // scan size in mm or meters pending on scanning mode
+      scanSize: 1.0, // scan size in mm or meters pending on scanning mode
     }
   }
 
@@ -130,8 +130,7 @@ export default class App extends React.Component {
 
   onScannerStop = async () => {
     try {
-      status = await Roux.generateMesh()
-      console.log(`generateMesh: ${status}`)
+      await Roux.generateMesh()
     } catch (err) {
       console.warn(err)
     }
@@ -140,6 +139,11 @@ export default class App extends React.Component {
   onGenerateMesh = () => {
     // call back that generate mesh finished
     console.log('MESH GENERATED')
+    Alert.alert(
+      'Scanning Complete',
+      `Mesh has been generated on scanning device.`,
+      [{ text: 'Take new scan', onPress: this.setupPreview }]
+    )
   }
 
   onSaveMesh = async () => {
@@ -181,10 +185,6 @@ export default class App extends React.Component {
     }
   }
 
-  handleScannerReady = () => {
-    // console.log('Hi im ready')
-  }
-
   handleIPAddressPickerChange = (IPAddress) => {
     this.setState({ connectedIPAddress: IPAddress })
   }
@@ -216,7 +216,6 @@ export default class App extends React.Component {
         <RouxView
           style={styles.roux}
           onScanStateChanged={this.handleScanStateChanged}
-          onScannerReady={this.handleScannerReady}
           onVisualizerReady={this.setupPreview}
           onHostDiscovered={this.handleHostDiscovered}
           onPreviewStart={this.onPreviewStart}
@@ -252,6 +251,7 @@ export default class App extends React.Component {
                     minimumValue={0.2}
                     maximumValue={4}
                     onSlidingComplete={this.setSize}
+                    value={this.state.scanSize}
                     style={styles.slider}
                   />
                   <Text style={styles.previewLabel}>
@@ -275,15 +275,7 @@ export default class App extends React.Component {
             )}
             {scanState === 'VIEWING' && (
               <>
-                {/* <TouchableOpacity onPress={this.saveScan} style={styles.button}>
-                  <Text style={styles.buttonText}>SAVE</Text>
-                </TouchableOpacity> */}
-                <TouchableOpacity
-                  onPress={this.setupPreview}
-                  style={styles.newScanButton}
-                >
-                  <Text style={styles.buttonText}>NEW SCAN</Text>
-                </TouchableOpacity>
+                {/* Nothing to see here! All mesh commands are rendered on the Scanning Device. */}
               </>
             )}
           </>
