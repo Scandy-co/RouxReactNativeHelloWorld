@@ -160,7 +160,6 @@ export default class App extends React.Component {
     try {
       const dirPath = `${RNFS.DocumentDirectoryPath}/${Date.now()}`
       await RNFS.mkdir(dirPath)
-      console.log('made dir', dirPath)
       const filePath = `${dirPath}/scan.ply`
       status = await Roux.saveScan(filePath)
       console.log(`saveScan: ${status}`)
@@ -335,9 +334,21 @@ export default class App extends React.Component {
                 )}
               </>
             )}
-
-            {scanState === 'SCANNING' && <></>}
-            {scanState === 'VIEWING' && <></>}
+            {scanState === 'SCANNING' && (
+              <>
+                {/* Nothing to see here! All scan commands are rendered on the Mirror Device. */}
+              </>
+            )}
+            {scanState === 'VIEWING' && (
+              <>
+                <TouchableOpacity
+                  onPress={this.saveScan}
+                  style={styles.button}
+                >
+                  <Text style={styles.buttonText}>Save Mesh</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </>
         )}
       </View>
