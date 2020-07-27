@@ -89,5 +89,5 @@ await Roux.connectToCommandHost(mirror_ip);
 We can then use that same IP address to tell the scanning device to send the rendered scan preview to the mirror device.
 
 ```
-await Roux.setServerHost(mirror_ip;
+await Roux.setServerHost(mirror_ip);
 ```
