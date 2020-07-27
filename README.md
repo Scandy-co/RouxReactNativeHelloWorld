@@ -1,59 +1,93 @@
-# RouxReactNativeHelloWorld
+# Networking via SDK
 
-Example app using Roux SDK with React Native bindings
+This feature allows two devices to be connected. One device captures the scan while the other device renders the preview.
 
-_PLEASE NOTE - DO NOT BUILD FOR A SIMULATOR - SCANDY CORE IS ONLY PACKAGED TO BE RUN ON DEVICE_
+## Terminology
 
-## Compatibility
+**Scanning Device**: The device which does the scanning.
+- runs SLAM & reconstruction pipeline
+- sends the scan preview screen
+- receives scan commands
 
-This react-native-roux-sdk is built to be used with `ScandyCore.framework` **v0.7.2**.
+**Mirror Device**: The device which renders scan preview and controls the scan process.
+- receives scan view
+- sends scan commands (start, stop, set scan size, etc.)
 
-We are still working on version linking this React Native package and the Roux SDK framework.
+## Setting Up Mirror Device
 
-## Setup
+1. Receive scan view
+The main purpose a mirror device is to receive the scan screen from the scanning device, so we must also configure that.
 
-### Roux License
-
-To run this example, you will need to generate a license through the [Roux Portal](http://roux.scandy.co). If you have not already, sign up as a developer to gain access to the developer dashboard. Create a new project and click the 'Download License' button.
-
-Rename the license to `ScandyCoreLicense.txt` and move into `ios/ScandyCoreLicense/`. Its path will be `ios/ScandyCoreLicense/ScandyCoreLicense.txt`
-
-Open `ios/RouxSdkExample.xcworkspace` in Xcode.
-
-Select the `RouxSdkExample` target and ensure `ScandyCoreLicense.txt` is in the `Build Phases` -> `Copy Bundle Resources`.
-
-### Scandy Core Framework
-
-If you haven't already, download the SDK (button can be found in the top navigation bar of the Roux Portal). Extract the `ScandyCore.zip` file and move `ScandyCore.framework` into `ios/Frameworks/`.
-
-In Xccode, select the `RouxSdkExample` target and ensure `ScandyCore.framework` is in the `General` -> `Frameworks, Libraries and Embedded Content`.
-
-Connect a device and build in Xcode.
-
-### node_modules
-
-```sh
-yarn
+```
+await Roux.setReceiveRenderedStream(true)
 ```
 
-Or if you prefer old school npm:
+2. Send scan commands
+ When we configure the mirror device to send network commands, calls to the following functions will be sent to the scanning device: `startScanning`, `stopScanning`, `generateMesh`, `setScanSize`, `setVoxelSize`, and `setNoiseFilter`. Again we have to explicitly tell the mirror device to send these.
 
-```sh
-npm install
+```
+await Roux.setSendNetworkCommands(true)
 ```
 
-### Cocoapods
+3. Initialize
+This device needs to initialize the Roux backend but must set the scanner type to `network` to tell it not to use data generated from the scanning device.
 
-```bash
-cd ios
-pod install
-cd ..
+
+```
+await Roux.initializeScanner('network')
 ```
 
-## Build
+## Setting Up the Scanning Device
 
-```bash
-open ios/RouxSdkExample.xcworkspace
+1. Send scan preview
+We have to tell the device to send the rendered scan preview...
+
+
+```
+await Roux.setSendRenderedStream(true)
 ```
 
-Then hit `cmd`+`r` to build and the run app.
+2. Receive scan commands
+ ... and to receive scan commands.
+
+```
+await Roux.setReceiveNetworkCommands(true)
+```
+
+1. Initialize
+The scanning device can be initialized as you normally would.
+
+
+```
+await Roux.initializeScanner('true_depth')
+```
+
+## Connecting the Devices
+
+First, both devices must be on the same wifi network.
+
+From the mirror device we need to get the IP address so we know which IP to look for the scanning device in. On mirror device call:
+
+```
+const ip_address = await Roux.getIPAddress()
+```
+
+
+On the scanner device search through the discovered host IP addresses. The IP address of the mirror device should be in this list.
+
+```
+var discovered_hosts = await Roux.getDiscoveredHosts()
+```
+
+Then connect the scanner device to the mirror device (where `mirror_ip` is the `string` IP address of mirror device).
+
+
+```
+await Roux.connectToCommandHost(mirror_ip);
+```
+
+We can then use that same IP address to tell the scanning device to send the rendered scan preview to the mirror device.
+
+```
+await Roux.setServerHost(mirror_ip;
+```
