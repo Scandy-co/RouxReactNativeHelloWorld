@@ -26,7 +26,7 @@ export default class App extends React.Component {
       discoveredHosts: [],
       scanState: '',
       v2ScanningMode: null, //v2ScanningMode defaults to true
-      scanSize: 1.0, // scan size in mm or meters pending on scanning mode
+      scanSize: 0.2, // scan size in mm or meters pending on scanning mode
     }
   }
 
@@ -145,14 +145,7 @@ export default class App extends React.Component {
   onSaveMesh = async () => {
     // call back that generate mesh finished
     console.log('MESH SAVED')
-    this.restartScanner()
-  }
-
-  restartScanner = async () => {
-    //NOTE: you do not need to call initializeScanner again;
-    // scanner will remain initialized until RouxView unmounts
-    status = await Roux.startPreview()
-    console.log(`startPreview: ${status}`)
+    this.setupPreview()
   }
 
   saveScan = async () => {
@@ -181,10 +174,8 @@ export default class App extends React.Component {
   setSize = async (val: number) => {
     try {
       const size = this.state.v2ScanningMode ? val * 1e-3 : val
-      status = await Roux.setSize(size)
-      console.log(`setSize: ${status}`)
-      // Round the number to the tenth precision
       this.setState({ scanSize: Math.floor(val * 10) / 10 })
+      await Roux.setSize(size)
     } catch (err) {
       console.warn(err)
     }
@@ -260,7 +251,7 @@ export default class App extends React.Component {
                   <Slider
                     minimumValue={0.2}
                     maximumValue={4}
-                    onValueChange={this.setSize}
+                    onSlidingComplete={this.setSize}
                     style={styles.slider}
                   />
                   <Text style={styles.previewLabel}>
@@ -288,7 +279,7 @@ export default class App extends React.Component {
                   <Text style={styles.buttonText}>SAVE</Text>
                 </TouchableOpacity> */}
                 <TouchableOpacity
-                  onPress={this.restartScanner}
+                  onPress={this.setupPreview}
                   style={styles.newScanButton}
                 >
                   <Text style={styles.buttonText}>NEW SCAN</Text>
@@ -330,7 +321,11 @@ export default class App extends React.Component {
                       style={
                         this.state.connectedIPAddress
                           ? { ...styles.button, backgroundColor: '#3053FF' }
-                          : { ...styles.button, backgroundColor: '#D3D3D3', opacity: .5 }
+                          : {
+                              ...styles.button,
+                              backgroundColor: '#D3D3D3',
+                              opacity: 0.5,
+                            }
                       }
                       disabled={!this.state.connectedIPAddress}
                       onPress={this.connectToHost}
