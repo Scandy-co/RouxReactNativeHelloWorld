@@ -67,7 +67,10 @@ export default class App extends React.Component {
     try {
       await Roux.initializeScanner('true_depth')
       var hosts = await Roux.getDiscoveredHosts()
-      this.setState({ discoveredHosts: hosts, displayIPPicker: true })
+      this.setState({ discoveredHosts: hosts })
+      if (!this.state.connectedToHost) {
+        this.setState({ displayIPPicker: true })
+      }
     } catch (err) {
       console.warn(err)
     }
@@ -126,11 +129,13 @@ export default class App extends React.Component {
 
   onGenerateMesh = () => {
     // call back that generate mesh finished
-    Alert.alert(
-      'Scanning Complete',
-      `Mesh has been generated on scanning device.`,
-      [{ text: 'Take new scan', onPress: this.setupPreview }]
-    )
+    if (this.state.selectedDeviceType === 0) {
+      Alert.alert(
+        'Scanning Complete',
+        `Mesh has been generated on scanning device.`,
+        [{ text: 'Take new scan', onPress: this.setupPreview }]
+      )
+    }
   }
 
   saveScan = async () => {
