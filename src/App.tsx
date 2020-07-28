@@ -88,8 +88,8 @@ export default class App extends React.Component {
     }
   }
 
-  handleHostDiscovered = async () => {
-    var hosts = await Roux.getDiscoveredHosts()
+  handleHostDiscovered = async (host) => {
+    const hosts = [...this.state.discoveredHosts, host]
     this.setState({ discoveredHosts: hosts })
   }
 
