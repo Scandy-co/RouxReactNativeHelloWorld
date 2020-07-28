@@ -91,13 +91,15 @@ export default class App extends React.Component {
 
   onSaveMesh = async () => {
     this.getSavedMeshes()
-    this.restartScanner()
+    if (!this.state.renderLoadedMesh) {
+      this.restartScanner()
+    }
   }
 
   restartScanner = async () => {
     if (this.state.renderLoadedMesh) {
       //Need to reinitialize scanner if we have a loaded mesh in our RouxView
-      this.setState({ renderLoadedMesh: false })
+      this.setState({ renderLoadedMesh: false, selectedMeshPath: '' })
       await Roux.uninitializeScanner()
       await Roux.initializeScanner('true_depth')
       this._drawer.close()
@@ -137,8 +139,8 @@ export default class App extends React.Component {
     }
   }
 
-  onLoadMesh = () => {
-    console.log("Mesh loaded")
+  onLoadMesh = (e) => {
+    console.log('Mesh loaded: ', e)
     this._drawer.close()
   }
 
@@ -149,6 +151,7 @@ export default class App extends React.Component {
     await Roux.uninitializeScanner()
     await Roux.initializeScanner('true_depth')
     await Roux.loadMesh({ meshPath: item.path })
+    this.setState({ selectedMeshPath: item.path })
   }
 
   getSavedMeshes = () => {
@@ -159,6 +162,17 @@ export default class App extends React.Component {
       })
       this.setState({ savedMeshes })
     })
+  }
+
+  saveCleanedMesh = async () => {
+    try {
+      await Roux.applyEditsFromMeshViewport(true)
+      await Roux.saveScan(this.state.selectedMeshPath)
+    } catch (e) {
+      console.warn(e)
+    }
+    console.log(status)
+    this._drawer.open()
   }
 
   async componentDidMount() {
@@ -280,6 +294,7 @@ export default class App extends React.Component {
                 style={{
                   ...styles.button,
                   backgroundColor: '#586168',
+                  left: 20,
                   bottom: 40,
                   height: 50,
                 }}
@@ -287,8 +302,62 @@ export default class App extends React.Component {
                   this._drawer.open()
                 }}
               >
-                <Text style={styles.buttonText}>View meshes</Text>
+                <Text style={styles.buttonText}>Go back</Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...styles.button,
+                  right: 0,
+                  bottom: 40,
+                  height: 50,
+                }}
+                onPress={this.saveCleanedMesh}
+              >
+                <Text style={styles.buttonText}>Save changes</Text>
+              </TouchableOpacity>
+              <View style={styles.actions}>
+                {/* TODO: play around with the values passed to the editing functions to see their results - or, get fancy and implement a slider! */}
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={async () => {
+                    await Roux.decimateMesh(0.9)
+                  }}
+                >
+                  <Text style={styles.buttonText}>Decimate</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={async () => {
+                    await Roux.smoothMesh(10)
+                  }}
+                >
+                  <Text style={styles.buttonText}>Smooth</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={async () => {
+                    await Roux.fillHoles(1)
+                  }}
+                >
+                  <Text style={styles.buttonText}>Fill Holes</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={async () => {
+                    await Roux.extractLargestSurface(0.1)
+                  }}
+                >
+                  <Text style={styles.buttonText}>Auto clean</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={async () => {
+                    await Roux.makeWaterTight(13)
+                  }}
+                >
+                  <Text style={styles.buttonText}>Make water tight</Text>
+                </TouchableOpacity>
+              </View>
             </>
           )}
         </Drawer>
@@ -326,7 +395,22 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: 'white',
   },
-  // actions: { backgroundColor: "transparent" },
+  actions: {
+    position: 'absolute',
+    bottom: 100,
+    backgroundColor: 'transparent',
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+  },
+  actionButton: {
+    backgroundColor: 'transparent',
+    padding: 10,
+    margin: 5,
+    borderWidth: 1,
+    borderColor: 'white',
+  },
   sliderContainer: {
     position: 'absolute',
     bottom: 120,
